@@ -39,7 +39,6 @@ async function query(q, values = []) {
 async function select(offset = 0, limit = 50) {
   const client = await pool.connect();
   try {
-    console.log("paging?");
     const q = 'SELECT * FROM signatures ORDER BY signed DESC OFFSET $1 LIMIT $2;';
     const result = await db.query(q, [offset, limit]);
 

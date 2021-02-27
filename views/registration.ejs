@@ -66,12 +66,14 @@
       </div>
       <% if (result._links.prev) { %>
         <button class="prev-page">
-          <a href="<%= result._links.prev.href %>#title2"><</a>
+          <a href="<%= result._links.prev.href %>"><</a>
         </button>
       <% } %>
+      <% if (result._links.next) { %>
       <button class="next-page">
-        <a href="<%= result._links.next.href %>#title2">></a>
+        <a href="<%= result._links.next.href %>">></a>
       </button>
+      <% } %>
       <table class="signature-list">
         <tbody>
           <thead>

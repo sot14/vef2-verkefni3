@@ -10,14 +10,15 @@ const { validationResult, body} = validator;
 const {
   PORT: port = process.env.port || 3000
 } = process.env;
-// TODO skráningar virkni
 
+// TODO skráningar virkni
 function catchErrors(fn) {
     return (req, res, next) => fn(req, res, next).catch(next);
   }
 
-async function showSignatures(req, res) {
+export async function showSignatures(req, res, isAdmin) {
   let { offset = 0, limit = 50 } = req.query;
+  console.log("query", req.query);
   offset = Number(offset);
   limit = Number(limit);
   const signatureList = await db.select(offset, limit);
@@ -29,6 +30,7 @@ async function showSignatures(req, res) {
       anonymous: 'false',
       errors: [],
       signatureList,
+      isAdmin
     };
 
     const result = {
@@ -52,10 +54,6 @@ async function showSignatures(req, res) {
       };
     }
   
-  
-    // var page = res.json(result);
-    // var page = result;
-    console.log(result._links);
     return res.render('registration', {data, result});
 }
 

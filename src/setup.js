@@ -48,6 +48,10 @@ async function insertFakes(n) {
     await query(nextQuery, [name, nationalId, comment, anonymous, signed]);
     console.log("inserted query ", i);
   }
+  // insert user admin
+  const userQuery = 'INSERT INTO users (username, password, admin) VALUES ($1, $2, $3);';
+  await query(userQuery, ["admin", "password", true]);
+  await query(userQuery, ["normalUser", "password", false]);
 }
 
 async function main() {
