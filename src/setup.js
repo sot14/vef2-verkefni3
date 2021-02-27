@@ -6,12 +6,17 @@ import faker from 'faker';
 
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL;
+const {
+  DATABASE_URL: connectionString,
+  NODE_ENV: nodeEnv = 'development',
+} = process.env;
+
+const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
 
 const readFileAsync = util.promisify(fs.readFile);
 
 async function query(q, values = []) {
-    const pool = new pg.Pool({ connectionString });
+    const pool = new pg.Pool({ connectionString, ssl });
 
 
   const client = await pool.connect();
@@ -71,14 +76,6 @@ async function main() {
     return;
   }
 
-  // bæta faker færslum við töflu
-  // try {
-  //   const insert = await readFileAsync('./sql/fake.sql');
-  //   await query(insert.toString('utf8'));
-  //   console.info('Gögnum bætt við');
-  // } catch (e) {
-  //   console.error('Villa við að bæta gögnum við:', e.message);
-  // }
   try {
     await insertFakes(500);
     console.info('Gögnum bætt við');
