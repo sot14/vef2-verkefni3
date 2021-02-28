@@ -18,10 +18,11 @@ function catchErrors(fn) {
 
 export async function showSignatures(req, res, isAdmin) {
   let { offset = 0, limit = 50 } = req.query;
-  console.log("query", req.query);
   offset = Number(offset);
   limit = Number(limit);
   const signatureList = await db.select(offset, limit);
+  let signaturesLength = await db.query(`SELECT COUNT(*) AS count FROM signatures;`);
+  signaturesLength = signaturesLength.rows[0].count;
   const data = {
       title: 'Undirskriftarlisti',
       name: '',
@@ -30,6 +31,7 @@ export async function showSignatures(req, res, isAdmin) {
       anonymous: 'false',
       errors: [],
       signatureList,
+      signaturesLength,
       isAdmin
     };
 
@@ -37,6 +39,7 @@ export async function showSignatures(req, res, isAdmin) {
       _links: {
         self: {
           href: `http://localhost:${port}/?offset=${offset}&limit=${limit}`,
+          offset: offset,
         },
       },
       items: signatureList,
@@ -53,6 +56,8 @@ export async function showSignatures(req, res, isAdmin) {
         href: `http://localhost:${port}/?offset=${Number(offset) + limit}&limit=${limit}`,
       };
     }
+
+    console.log(result);
   
     return res.render('registration', {data, result});
 }
