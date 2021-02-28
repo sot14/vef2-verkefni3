@@ -16,12 +16,11 @@ pool.on('error', (err) => {
 
 export async function comparePasswords(password, user) {
     console.log("comparing passwords");
-    console.log("password", password);
-    console.log("password", user.password);
+
     const result = await bcrypt.compare(password, user.password);
-    console.log(result);
+    if(result) return user;
   
-    return result;
+    return false;
   }
   
   export async function findByUsername(username) {
@@ -86,6 +85,7 @@ export async function showUsers() {
 
 // Geymum id á notanda í session, það er nóg til að vita hvaða notandi þetta er
 export function serializeUser(user, done) {
+    console.log("serialize user", user);
     done(null, user.id);
   }
   

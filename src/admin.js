@@ -23,6 +23,9 @@ async function ensureLoggedIn(req, res) {
 
 async function login(req, res) {
     console.log("in function login");
+    if(req.isAuthenticated()) {
+        return res.redirect('/admin');
+    }
 
     let message = '';
     console.log("req session messages", req.session.messages);
