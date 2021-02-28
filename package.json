@@ -34,7 +34,7 @@
     "sass": "node-sass ./public/styles.scss ./public/styles.css",
     "sass-watch": "node-sass --source-map-embed --watch ./public/styles/scss/styles.scss --recursive ./public/styles/css/styles.css"
   },
-  "name": "vef2-verkefni2",
+  "name": "vef2-verkefni3",
   "description": "[Kynning í fyrirlestri](https://www.youtube.com/watch?v=1kRJBE040oY).",
   "version": "1.0.0",
   "main": ".eslintrc.js",

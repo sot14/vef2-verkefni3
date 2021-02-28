@@ -38,7 +38,7 @@ export async function showSignatures(req, res, isAdmin) {
     const result = {
       _links: {
         self: {
-          href: `http://localhost:${port}/?offset=${offset}&limit=${limit}`,
+          href: `/?offset=${offset}&limit=${limit}`,
           offset: offset,
         },
       },
@@ -47,13 +47,13 @@ export async function showSignatures(req, res, isAdmin) {
   
     if (offset > 0) {
       result._links.prev = {
-        href: `http://localhost:${port}/?offset=${offset - limit}&limit=${limit}`,
+        href: `/?offset=${offset - limit}&limit=${limit}`,
       };
     }
   
     if (signatureList.length <= limit) {
       result._links.next = {
-        href: `http://localhost:${port}/?offset=${Number(offset) + limit}&limit=${limit}`,
+        href: `/?offset=${Number(offset) + limit}&limit=${limit}`,
       };
     }
 
