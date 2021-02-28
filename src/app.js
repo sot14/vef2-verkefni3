@@ -2,7 +2,8 @@ import express from 'express';
 import dotenv from 'dotenv';
 import session from 'express-session';
 import passport from 'passport';
-import { Strategy } from 'passport-local';
+import passportLocal from 'passport-local';
+const { Strategy } = passportLocal;
 import { router as registrationRouter } from './registration.js';
 import { router as adminRouter } from './admin.js';
 import { utils } from './utils.js';
@@ -17,18 +18,15 @@ const {
 } = process.env;
 
 if (!connectionString || !sessionSecret) {
-  console.log("cs", connectionString);
-  console.log("ss", sessionSecret);
   console.error('Vantar gögn í env');
   process.exit(1);
 }
 
 const app = express();
 
-
 app.use(express.urlencoded( {extended: true} ));
 app.use(session({
-  name: "counter.sid",
+  name: 'localSession',
   secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
@@ -65,14 +63,11 @@ app.locals.dateFormatter = function(date) {
  */
 async function strat(username, password, done) {
   try {
-    console.log("finding user");
     const user = await findByUsername(username);
-    console.log("found user", user);
 
     if (!user) {
       return done(null, false);
     }
-
     // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
  
     const result = await comparePasswords(password, user);
@@ -84,14 +79,14 @@ async function strat(username, password, done) {
     return done(err);
   }
 }
-
+// Látum express nota passport með session
+app.use(passport.initialize());
+app.use(passport.session());
 // Notum local strategy með „strattinu“ okkar til að leita að notanda
 passport.use(new Strategy(strat));
 passport.serializeUser(serializeUser);
 passport.deserializeUser(deserializeUser);
-// Látum express nota passport með session
-app.use(passport.initialize());
-app.use(passport.session());
+
 
 // Gott að skilgreina eitthvað svona til að gera user hlut aðgengilegan í
 // viewum ef við erum að nota þannig
@@ -107,6 +102,7 @@ app.use((req, res, next) => {
 // Hjálpar middleware sem athugar hvort notandi sé innskráður og hleypir okkur
 // þá áfram, annars sendir á /login
 function ensureLoggedIn(req, res) {
+  console.log("ensure logged in", req);
   if (req.isAuthenticated()) {
     return res.redirect('/admin');
   }

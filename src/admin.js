@@ -10,7 +10,7 @@ function catchErrors(fn) {
   }
 
 async function ensureLoggedIn(req, res) {
-    console.log("ensure logged in");
+    // console.log("ensure logged in", req);
     if (req.isAuthenticated()) {
         let isAdmin = true;
       return await showSignatures(isAdmin);

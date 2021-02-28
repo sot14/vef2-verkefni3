@@ -67,6 +67,12 @@ hr {
   text-align: center;
 }
 
+.paging {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .signature-list {
   margin: auto;
 }

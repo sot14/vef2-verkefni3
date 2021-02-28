@@ -92,8 +92,10 @@ export function serializeUser(user, done) {
   // Sækir notanda út frá id
 export async function deserializeUser(id, done) {
     console.log("deserializing user");
+    console.log(id, done);
     try {
       const user = await findById(id);
+      console.log(user);
       done(null, user);
     } catch (err) {
       done(err);
