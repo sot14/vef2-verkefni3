@@ -6,7 +6,7 @@ import { Strategy } from 'passport-local';
 import { router as registrationRouter } from './registration.js';
 import { router as adminRouter } from './admin.js';
 import { utils } from './utils.js';
-import { comparePasswords, findByUsername, findById } from './users.js';
+import { serializeUser, deserializeUser, comparePasswords, findByUsername } from './users.js';
 
 dotenv.config();
 
@@ -17,6 +17,8 @@ const {
 } = process.env;
 
 if (!connectionString || !sessionSecret) {
+  console.log("cs", connectionString);
+  console.log("ss", sessionSecret);
   console.error('Vantar gögn í env');
   process.exit(1);
 }
@@ -26,6 +28,7 @@ const app = express();
 
 app.use(express.urlencoded( {extended: true} ));
 app.use(session({
+  name: "counter.sid",
   secret: sessionSecret,
   resave: false,
   saveUninitialized: false,
@@ -64,13 +67,16 @@ async function strat(username, password, done) {
   try {
     console.log("finding user");
     const user = await findByUsername(username);
+    console.log("found user", user);
 
     if (!user) {
       return done(null, false);
     }
 
     // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
+ 
     const result = await comparePasswords(password, user);
+    console.log("passwords compared");
     return done(null, result);
   } catch (err) {
     console.error(err);
@@ -80,30 +86,11 @@ async function strat(username, password, done) {
 
 // Notum local strategy með „strattinu“ okkar til að leita að notanda
 passport.use(new Strategy(strat));
-
-// getum stillt með því að senda options hlut með
-// passport.use(new Strategy({ usernameField: 'email' }, strat));
-
-// Geymum id á notanda í session, það er nóg til að vita hvaða notandi þetta er
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
-
-// Sækir notanda út frá id
-passport.deserializeUser(async (id, done) => {
-  console.log("finding user");
-  try {
-    const user = await findById(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
-
+passport.serializeUser(serializeUser);
+passport.deserializeUser(deserializeUser);
 // Látum express nota passport með session
 app.use(passport.initialize());
 app.use(passport.session());
-
 
 // Gott að skilgreina eitthvað svona til að gera user hlut aðgengilegan í
 // viewum ef við erum að nota þannig

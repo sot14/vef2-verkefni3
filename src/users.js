@@ -14,8 +14,12 @@ pool.on('error', (err) => {
   process.exit(-1);
 });
 
-export async function comparePasswords(password, hash) {
-    const result = await bcrypt.compare(password, hash);
+export async function comparePasswords(password, user) {
+    console.log("comparing passwords");
+    console.log("password", password);
+    console.log("password", user.password);
+    const result = await bcrypt.compare(password, user.password);
+    console.log(result);
   
     return result;
   }
@@ -53,19 +57,19 @@ export async function comparePasswords(password, hash) {
     return null;
   }
   
-export async function createUser(username, password) {
+export async function createUser(username, password, isAdmin) {
     // Geymum hashað password!
     const hashedPassword = await bcrypt.hash(password, 11);
   
     const q = `
       INSERT INTO
-        users (username, password)
-      VALUES ($1, $2)
+        users (username, password, admin)
+      VALUES ($1, $2, $3)
       RETURNING *
     `;
   
     try {
-      const result = await db.query(q, [username, hashedPassword]);
+      const result = await db.query(q, [username, hashedPassword, isAdmin]);
       return result.rows[0];
     } catch (e) {
       console.error('Gat ekki búið til notanda');
@@ -79,3 +83,19 @@ export async function showUsers() {
     const result = await db.query(q);
     return result.rows;
 }
+
+// Geymum id á notanda í session, það er nóg til að vita hvaða notandi þetta er
+export function serializeUser(user, done) {
+    done(null, user.id);
+  }
+  
+  // Sækir notanda út frá id
+export async function deserializeUser(id, done) {
+    console.log("deserializing user");
+    try {
+      const user = await findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  }

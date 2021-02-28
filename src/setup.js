@@ -3,6 +3,7 @@ import fs from 'fs';
 import util from 'util';
 import pg from 'pg';
 import faker from 'faker';
+import {createUser} from './users.js';
 
 dotenv.config();
 
@@ -51,12 +52,12 @@ async function insertFakes(n) {
 
     const nextQuery = `INSERT INTO signatures (name, nationalId, comment, anonymous, signed) VALUES ($1, $2, $3, $4, $5);`;
     await query(nextQuery, [name, nationalId, comment, anonymous, signed]);
-    console.log("inserted query ", i);
+    if(i%50==0) console.log("inserted query ", i);
   }
   // insert user admin
-  const userQuery = 'INSERT INTO users (username, password, admin) VALUES ($1, $2, $3);';
-  await query(userQuery, ["admin", "password", true]);
-  await query(userQuery, ["normalUser", "password", false]);
+
+  await createUser("admin", "password", true)
+  await createUser("normalUser", "password", false);
 }
 
 async function main() {
